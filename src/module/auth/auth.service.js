@@ -60,7 +60,7 @@ export const login = async (req, res, next) => {
 
       return res
         .status(201)
-        .json({ message: " user created",token });
+        .json({ message: "Logged in",token });
     }
    catch (error) {
     return res.status(error.cause || 500).json({
