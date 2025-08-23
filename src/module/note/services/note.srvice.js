@@ -83,27 +83,26 @@ export const updateAllNote = async (req,res,next)=>{
         const{authorization} = req.headers
         const decoded = jwt.verify(authorization,"usertoken")
         const user = await User.findById(decoded.id)
+        const userId = decoded.id
         if(!user){
             return res.status(404).json({message:"user not found"})
         }
         const {title}= req.body
         if(!title){
-            throw new Error("title is required", 400)
+            // throw new Error("title is required", 400)
+            return res.status(404).json({message:"no notes found"})
         }
-        const note = await Note.findById(noteId)
+        const notes = await Note.find({userId})
 
-        if(!note){
-            return res.status(404).json({message:"note not found"})
+        if(!notes||notes.length == 0){
+              return res.status(404).json({message:"no notes found"})
         }
-        if(!note.userId ){
-            return res.status(400).json({message:"note not have userIf"})
-        }
-        if(note.userId.toString() !== decoded.id){
-            return res.status(404).json({message:"not note owner"})
-        }
-        const newnote = await Note.replaceOne({_id : noteId}, {...req.body}, {new:true})
+       
+        const updatedNote = await Note.updateMany({userId}, {
+            $set:{title}
+        })
         
-        return res.status(201).json({message:"note updated", updatedNote: newnote} )
+        return res.status(201).json({message:"all notes updated", updatedNote} )
         
     } catch (error) {
         return res.status(500).json({message:"server error", error, message:error.message})
