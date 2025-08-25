@@ -153,3 +153,19 @@ export const deletednote = async (req, res, next) => {
       .json({ message: "server error", error, message: error.message });
   }
 };
+export const paginateNote = async (req, res, next) => {
+  try {
+    const { authorization } = req.headers;
+    const decoded = jwt.verify(authorization, "usertoken");
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res.status(404).json({ message: "user not found" });
+    }
+
+    return res.status(201).json({ message: "note deleted", deletednote });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "server error", error, message: error.message });
+  }
+};
